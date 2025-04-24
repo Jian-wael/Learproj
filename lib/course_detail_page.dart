@@ -181,7 +181,7 @@ class CameraPreviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Camera Preview")),
+      appBar: AppBar(title: const Text("Try it")),
       body: CameraPreview(controller),
     );
   }

@@ -4,6 +4,8 @@ import 'package:untitled/core/pallet.dart';
 import 'package:untitled/features/start_screen.dart';
 import 'package:untitled/model.dart';
 import 'package:untitled/course_detail_page.dart';
+import '../course_detail_page.dart';
+
 
 
 class HomeScreen extends StatefulWidget {
