@@ -32,6 +32,8 @@ dependencies:
     sdk: flutter
   provider: ^6.0.5  # Ensure this is added
   fluttertoast: ^8.2.12 # Ensure this is added
+  camera: ^0.10.0+2
+
 
 
 

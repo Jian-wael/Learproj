@@ -1,21 +1,59 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/model.dart';
 
-class CourseDetailPage extends StatelessWidget {
+class CourseDetailPage extends StatefulWidget {
   final Course course;
 
   const CourseDetailPage({super.key, required this.course});
 
   @override
+  _CourseDetailPageState createState() => _CourseDetailPageState();
+}
+
+class _CourseDetailPageState extends State<CourseDetailPage> {
+  CameraController? _controller;
+  List<CameraDescription>? _cameras;
+  bool _isCameraInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  // Initialize the camera
+  Future<void> _initializeCamera() async {
+    // Get list of available cameras
+    _cameras = await availableCameras();
+
+    // If cameras are available, initialize the first one
+    if (_cameras!.isNotEmpty) {
+      _controller = CameraController(_cameras![0], ResolutionPreset.high);
+      await _controller!.initialize();
+      setState(() {
+        _isCameraInitialized = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose the camera controller when the page is disposed
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: course.bgcolor,
-        title: Text(course.title),
+        backgroundColor: widget.course.bgcolor,
+        title: Text(widget.course.title),
         centerTitle: true,
       ),
       body: Container(
-        color: course.bgcolor,
+        color: widget.course.bgcolor,
         child: Column(
           children: [
             // الصورة الأساسية
@@ -27,7 +65,7 @@ class CourseDetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Center(
-                child: Image.asset(course.image),
+                child: Image.asset(widget.course.image),
               ),
             ),
             Expanded(
@@ -36,7 +74,7 @@ class CourseDetailPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      course.title,
+                      widget.course.title,
                       style: const TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -45,7 +83,7 @@ class CourseDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      course.subtitle,
+                      widget.course.subtitle,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black87,
@@ -56,7 +94,7 @@ class CourseDetailPage extends StatelessWidget {
                     const SizedBox(height: 30),
 
                     // ✅ صورة إضافية صغيرة
-                    if (course.extraImage != null)
+                    if (widget.course.extraImage != null)
                       Container(
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(10),
@@ -74,7 +112,7 @@ class CourseDetailPage extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(15),
                           child: Image.asset(
-                            course.extraImage!,
+                            widget.course.extraImage!,
                             height: 180, // ✅ تم تقليله
                             width: double.infinity,
                             fit: BoxFit.contain,
@@ -93,7 +131,17 @@ class CourseDetailPage extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 child: GestureDetector(
                   onTap: () {
-                    // ممكن تضيف وظيفة هنا مثلاً لفتح الكاميرا
+                    // فتح الكاميرا
+                    if (_isCameraInitialized) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CameraPreviewPage(
+                            controller: _controller!,
+                          ),
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -120,6 +168,21 @@ class CourseDetailPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// صفحة الكاميرا لعرض الكاميرا عند فتحها
+class CameraPreviewPage extends StatelessWidget {
+  final CameraController controller;
+
+  const CameraPreviewPage({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Camera Preview")),
+      body: CameraPreview(controller),
     );
   }
 }
